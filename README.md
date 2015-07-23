@@ -1,4 +1,4 @@
-# MIPS_Project
+#MIPS Project
 
 Contributors:
 - Austin Pantoja
