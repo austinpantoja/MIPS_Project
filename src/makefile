@@ -9,4 +9,4 @@ run:
 	./spimcore $(IN_FILE)
 
 clean:
-	rm project
+	rm spimcore
