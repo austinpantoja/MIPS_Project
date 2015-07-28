@@ -1,13 +1,18 @@
-//Austin
 #include "spimcore.h"
+
+
+/** Change Log
+ * 7/28 - Completed instruction_partition() by assigning the corresponding value for all of the parameters using bitmasking. - Austin
+ *
+ */
 
 
 /* ALU */
 /* 10 Points */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
-
 }
+
 
 /* instruction fetch */
 /* 10 Points */
@@ -21,7 +26,13 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 /* 10 Points */
 void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsigned *r2, unsigned *r3, unsigned *funct, unsigned *offset, unsigned *jsec)
 {
-
+    *op = instruction & 0xfc000000;
+    *r1 = instruction & 0x3e00000;
+    *r2 = instruction & 0x1f0000;
+    *r3 = instruction & 0xf800;
+    *funct = instruction & 0x3f;
+    *offset = instruction & 0xffff;
+    *jsec = instruction & 0x3ffffff;
 }
 
 
@@ -76,4 +87,5 @@ void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char 
 {
 
 }
+
 
