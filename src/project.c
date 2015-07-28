@@ -283,6 +283,10 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
     if (RegWrite == 1) {
 
         switch(MemtoReg) {
+<<<<<<< HEAD
+=======
+
+>>>>>>> cd8fb09e53a2dda35caf2222f39ea50f8299130e
             case 0:
                //Value from ALUresult
                if (RegDst == 0) {
@@ -294,8 +298,13 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
                break;
 
             case 1:
+<<<<<<< HEAD
                //Value from memdata
                if (RegDst == 0) {
+=======
+                //Value from memdata
+                if (RegDst == 0) {
+>>>>>>> cd8fb09e53a2dda35caf2222f39ea50f8299130e
                     Reg[r2] = memdata;
                }
                else {
