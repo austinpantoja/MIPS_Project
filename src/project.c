@@ -245,8 +245,44 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 /* 10 Points */
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
+    if (ALUSrc == 1) 
+        data2 = extended_value;
+    if (ALUOp == 7) {
+        // funct values from R-type instructions table on MIPS slides pg. 106
+        // add, sub, and, or, slt, sltu, left shitf
+        switch(funct) {
+            case 4: // sllv (for the 16 bit left shift)
+                ALUOp = 6;
+                break;
+            case 32: //add
+                ALUOp = 1;
+                break;
+            case 34: //sub
+                ALUOp = 2;
+                break;
+            case 36: //and
+                ALUOp = 4;
+                break;
+            case 37: //or
+                ALUOp = 5;
+                break;
+            case 39: //not
+                ALUOp = 7;
+                break;
+            case 42: //slt
+                ALUOp = 2;
+                break;
+            case 43: //sltu
+                ALUOp = 3;
+                break;
+            default: //not a proper function
+                return 1;
+        }
+    }
+    ALU(data1, data2, ALUOp, ALUresult, Zero);
     return 0;
 }
+
 
 /* Read / Write Memory */
 /* 10 Points */
