@@ -2,15 +2,56 @@
 
 
 /** Change Log
- * 7/28 - Completed instruction_partition() by assigning the corresponding value for all of the parameters using bitmasking. - Austin
- *
+ * 7/28 - Completed instruction_partition() by assigning the corresponding value for all of the parameters using bitmasking. -Austin
+ * 7/28 - Completed ALU() function. -Austin
  */
 
 
 /* ALU */
 /* 10 Points */
+/* Since I have used it below and you may not be familiar, the ternary operator (?:) in C (and Java)
+ *      value = (condition) ? [if true] : [if false]
+ *      This is basically and if-else statement used to set a particular value
+ *
+ * I am pretty sure this is right (at least mostly), but I am not sure how to test right now. This is where I think this could be wrong.
+ *  > For cases 0 and 1 (add/sub) I am assuming the sign (positive/negative) logic is handled somewhere else
+ *      I'm shakey on the material since the last test, if this is a problem we can cast A and B to signed for the operation
+ *  > Currently, the value pointed to by Zero is set every time the function is called (last line of the function)
+ *      I don't really like giving a value to *Zero and not *ALUresult (cases where ALUControl is <0, >7, or =6)
+ *      Since ALUresult is a pointer there'll always be some value, and it could have some meaningful initial value from somewhere else(?)
+ *  > ALUControl is a binary number on the table that describes ALU() in ProjectGuide.doc
+ *      Since the value is given as a char, I am comparing with it's ASCII value directly
+ *      If this doesn't work we could try casting ALUControl in the switch, or altering the values in the cases (using 0x, 0b, or char vals)
+ */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
+    switch(ALUControl) {
+        case 0:
+            *ALUresult = A + B;
+            break;
+        case 1:
+            *ALUresult = A - B;
+            break;
+        case 2:
+            *ALUresult = ((signed)A < (signed)B) ? 1 : 0;
+            break;
+        case 3:
+            *ALUresult = (A < B) ? 1 : 0;
+            break;
+        case 4:
+            *ALUresult = A & B;
+            break;
+        case 5:
+            *ALUresult = A | B;
+            break;
+        case 6:
+            B <<= 16;
+            break;
+        case 7:
+            *ALUresult = ~A;
+            break;
+    }
+    *Zero = (*ALUresult == 0) ? 1 : 0;
 }
 
 
@@ -26,6 +67,7 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 /* 10 Points */
 void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsigned *r2, unsigned *r3, unsigned *funct, unsigned *offset, unsigned *jsec)
 {
+    // May need to cast the hex values to unsigned, but I don't think that should make any difference
     *op = instruction & 0xfc000000;
     *r1 = instruction & 0x3e00000;
     *r2 = instruction & 0x1f0000;
