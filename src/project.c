@@ -13,6 +13,18 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
+    /*fetch the instruction addressed by PC from Mem and write it to instruction
+    if PC is a multiple of 4 and is within memory*/
+    if(PC % 4 == 0 && PC <= 0xFFFF)
+    {
+        *instruction = Mem[PC >> 2];
+        return 0;
+    }
+
+    /*if a halt condition occurs:
+    counter was not a multiple of 4 or was out of range*/
+    else
+        return 1;
 
 }
 
