@@ -116,7 +116,7 @@ void sign_extend(unsigned offset,unsigned *extended_value)
     //signbit is the most signifigant bit
     unsigned SignBit = offset >> 15;
 
-    if (Signbit == 1) {
+    if (SignBit == 1) {
 
         //if negative, first 16 bits will be made 1s
         *extended_value = 0xFFFF0000 | offset;
@@ -169,9 +169,9 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 {
     if (RegWrite == 1) {
 
-        Switch(MemtoReg) {
+        switch(MemtoReg) {
 
-            Case 0:
+            case 0:
                //Value from ALUresult
                if (RegDst == 0) {
                     Reg[r2] = ALUresult;
@@ -181,10 +181,10 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
                }
                break;
 
-            Case 1:
+            case 1:
                 //Value from memdata
                 if (RegDst == 0) {
-                    Reg[r2] = memdadta;
+                    Reg[r2] = memdata;
                }
                else {
                     Reg[r3] = memdata;
