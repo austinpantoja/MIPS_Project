@@ -68,10 +68,10 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsigned *r2, unsigned *r3, unsigned *funct, unsigned *offset, unsigned *jsec)
 {
     // May need to cast the hex values to unsigned, but I don't think that should make any difference
-    *op = instruction & 0xfc000000;
-    *r1 = instruction & 0x3e00000;
-    *r2 = instruction & 0x1f0000;
-    *r3 = instruction & 0xf800;
+    *op = (instruction & 0xfc000000) >> 26;
+    *r1 = (instruction & 0x3e00000) >> 21;
+    *r2 = (instruction & 0x1f0000) >> 16;
+    *r3 = (instruction & 0xf800) >> 11;
     *funct = instruction & 0x3f;
     *offset = instruction & 0xffff;
     *jsec = instruction & 0x3ffffff;
