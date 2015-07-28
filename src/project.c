@@ -59,16 +59,15 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
-    /*fetch the instruction addressed by PC from Mem and write it to instruction
-    if PC is a multiple of 4 and is within memory*/
+    //fetch the instruction addressed by PC from Mem and write it to instruction
+    //if PC is a multiple of 4 and is within memory
     if(PC % 4 == 0 && PC <= 0xFFFF)
     {
         *instruction = Mem[PC >> 2];
         return 0;
     }
 
-    /*if a halt condition occurs:
-    counter was not a multiple of 4 or was out of range*/
+    //halt condition occured - counter was not a multiple of 4 or was out of range
     else
         return 1;
 
@@ -140,7 +139,27 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
+    //write the value of data2 to the memory location addressed by ALUresult
+    if(MemWrite == 1)
+    {
+        //check for word alignment
+        if(ALUresult % 4 != 0)
+            return 1;
+        else
+            Mem[ALUresult >> 2] = data2;
+    }
 
+    //read the content of the memory location addressed by ALUresult to memdata
+    if(MemRead == 1)
+    {
+        //check for word alignment
+        if(ALUresult % 4 != 0)
+            return 1;
+        else
+            *memdata = Mem[ALUresult >> 2];
+    }
+
+    return 0;
 }
 
 
@@ -179,7 +198,17 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
+    //branch
+    if(Branch == 1 && Zero == 1)
+        *PC = *PC +4 + (extended_value << 2);
 
+    //jump
+    if(Jump == 1)
+        *PC = (*PC & 0xF0000000) + (jsec << 2);
+
+    //next instruction
+    else
+        *PC = *PC + 4;
 }
 
 
