@@ -245,7 +245,7 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 /* 10 Points */
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
-
+    return 0;
 }
 
 /* Read / Write Memory */
@@ -283,33 +283,20 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
     if (RegWrite == 1) {
 
         switch(MemtoReg) {
-<<<<<<< HEAD
-=======
-
->>>>>>> cd8fb09e53a2dda35caf2222f39ea50f8299130e
             case 0:
                //Value from ALUresult
-               if (RegDst == 0) {
+               if (RegDst == 0) 
                     Reg[r2] = ALUresult;
-               }
-               else {
+               else 
                     Reg[r3] = ALUresult;
-               }
                break;
 
             case 1:
-<<<<<<< HEAD
                //Value from memdata
-               if (RegDst == 0) {
-=======
-                //Value from memdata
-                if (RegDst == 0) {
->>>>>>> cd8fb09e53a2dda35caf2222f39ea50f8299130e
+                if (RegDst == 0) 
                     Reg[r2] = memdata;
-               }
-               else {
+               else 
                     Reg[r3] = memdata;
-               }
                break;
         }
     }
