@@ -107,104 +107,106 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->MemWrite = 0;
             controls->ALUSrc = 0;
             controls->RegWrite = 1;
-            break;
-        // jump
+            return 0;
+        // j
         case 2:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 0;
+            controls->Jump = 1;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
             controls->ALUOp = 0;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 0;
+            controls->RegWrite = 0;
+            return 0;
         // beq
         case 4:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 2;
+            controls->Jump = 0;
+            controls->Branch = 1;
+            controls->MemRead = 0;
+            controls->MemtoReg = 2;
             controls->ALUOp = 1;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 0;
+            controls->RegWrite = 0;
+            return 0;
         // addi
         case 8:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
             controls->ALUOp = 0;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 1;
+            return 0;
         //slti
         case 10:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
             controls->ALUOp = 2;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 1;
+            return 0;
         //sltiu
         case 11:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
             controls->ALUOp = 3;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 1;
+            return 0;
         // lui
         case 15:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 0;
             controls->ALUOp = 6;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 0;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 1;
+            return 0;
         // lw
         case 35:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 0;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 2;
             controls->ALUOp = 0;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
+            controls->MemWrite = 1;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 0;
+            return 0;
         // sw
         case 43:
-            controls->RegDst = ;
-            controls->Jump = ;
-            controls->Branch = ;
-            controls->MemRead = ;
-            controls->MemtoReg = ;
+            controls->RegDst = 2;
+            controls->Jump = 0;
+            controls->Branch = 0;
+            controls->MemRead = 0;
+            controls->MemtoReg = 2;
             controls->ALUOp = 0;
-            controls->MemWrite = ;
-            controls->ALUSrc = ;
-            controls->RegWrite = ;
-            break;
-
+            controls->MemWrite = 1;
+            controls->ALUSrc = 1;
+            controls->RegWrite = 0;
+            return 0;
+        // Bad Instruction
+        default:
+            return 1;
     }
 }
 
@@ -227,7 +229,7 @@ void sign_extend(unsigned offset,unsigned *extended_value)
     //signbit is the most signifigant bit
     unsigned SignBit = offset >> 15;
 
-    if (Signbit == 1) {
+    if (SignBit == 1) {
 
         //if negative, first 16 bits will be made 1s
         *extended_value = 0xFFFF0000 | offset;
@@ -280,9 +282,8 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 {
     if (RegWrite == 1) {
 
-        Switch(MemtoReg) {
-
-            Case 0:
+        switch(MemtoReg) {
+            case 0:
                //Value from ALUresult
                if (RegDst == 0) {
                     Reg[r2] = ALUresult;
@@ -292,10 +293,10 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
                }
                break;
 
-            Case 1:
-                //Value from memdata
-                if (RegDst == 0) {
-                    Reg[r2] = memdadta;
+            case 1:
+               //Value from memdata
+               if (RegDst == 0) {
+                    Reg[r2] = memdata;
                }
                else {
                     Reg[r3] = memdata;
