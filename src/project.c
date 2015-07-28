@@ -103,7 +103,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->Branch = 0;
             controls->MemRead = 0;
             controls->MemtoReg = 0;
-            controls->ALUOp = 2;
+            controls->ALUOp = 7;
             controls->MemWrite = 0;
             controls->ALUSrc = 0;
             controls->RegWrite = 1;
@@ -115,7 +115,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->Branch = ;
             controls->MemRead = ;
             controls->MemtoReg = ;
-            controls->ALUOp = ;
+            controls->ALUOp = 0;
             controls->MemWrite = ;
             controls->ALUSrc = ;
             controls->RegWrite = ;
@@ -139,37 +139,49 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->Branch = ;
             controls->MemRead = ;
             controls->MemtoReg = ;
-            controls->ALUOp = ;
+            controls->ALUOp = 0;
             controls->MemWrite = ;
             controls->ALUSrc = ;
             controls->RegWrite = ;
             break;
-        //sltui
+        //slti
+        case 10:
+            controls->RegDst = ;
+            controls->Jump = ;
+            controls->Branch = ;
+            controls->MemRead = ;
+            controls->MemtoReg = ;
+            controls->ALUOp = 2;
+            controls->MemWrite = ;
+            controls->ALUSrc = ;
+            controls->RegWrite = ;
+            break;
+        //sltiu
         case 11:
             controls->RegDst = ;
             controls->Jump = ;
             controls->Branch = ;
             controls->MemRead = ;
             controls->MemtoReg = ;
-            controls->ALUOp = ;
+            controls->ALUOp = 3;
             controls->MemWrite = ;
             controls->ALUSrc = ;
             controls->RegWrite = ;
             break;
-        //lui
+        // lui
         case 15:
             controls->RegDst = ;
             controls->Jump = ;
             controls->Branch = ;
             controls->MemRead = ;
             controls->MemtoReg = ;
-            controls->ALUOp = ;
+            controls->ALUOp = 6;
             controls->MemWrite = ;
             controls->ALUSrc = ;
             controls->RegWrite = ;
             break;
-        //lw
-        case 34:
+        // lw
+        case 35:
             controls->RegDst = ;
             controls->Jump = ;
             controls->Branch = ;
@@ -180,7 +192,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = ;
             controls->RegWrite = ;
             break;
-        //sw
+        // sw
         case 43:
             controls->RegDst = ;
             controls->Jump = ;
