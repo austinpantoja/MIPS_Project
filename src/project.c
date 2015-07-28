@@ -114,6 +114,19 @@ void read_register(unsigned r1,unsigned r2,unsigned *Reg,unsigned *data1,unsigne
 void sign_extend(unsigned offset,unsigned *extended_value)
 {
 
+    //signbit is the most signifigant bit
+    unsigned SignBit = offset >> 15;
+
+    if (Signbit == 1) {
+
+        //if negative, first 16 bits will be made 1s
+        *extended_value = 0xFFFF0000 | offset;
+    }
+    else {
+
+        //if postive, first 16 bits will be made 0s
+        *extended_value = 0x0000FFFF & offset;
+    }
 }
 
 /* ALU operations */
@@ -135,7 +148,31 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 /* 10 Points */
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
+    if (RegWrite == 1) {
 
+        Switch(MemtoReg) {
+
+            Case 0:
+               //Value from ALUresult
+               if (RegDst == 0) {
+                    Reg[r2] = ALUresult;
+               }
+               else {
+                    Reg[r3] = ALUresult;
+               }
+               break;
+
+            Case 1:
+                //Value from memdata
+                if (RegDst == 0) {
+                    Reg[r2] = memdadta;
+               }
+               else {
+                    Reg[r3] = memdata;
+               }
+               break;
+        }
+    }
 }
 
 /* PC update */
