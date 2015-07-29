@@ -6,28 +6,28 @@
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
     switch(ALUControl) {
-        case 0:
+        case 0: // add
             *ALUresult = A + B;
             break;
-        case 1:
+        case 1: // sub
             *ALUresult = A - B;
             break;
-        case 2:
+        case 2: // slt
             *ALUresult = ((int)A < (int)B) ? 1 : 0;
             break;
-        case 3:
+        case 3: // sltu
             *ALUresult = (A < B) ? 1 : 0;
             break;
-        case 4:
+        case 4: // and
             *ALUresult = A & B;
             break;
-        case 5:
+        case 5: // or
             *ALUresult = A | B;
             break;
-        case 6:
+        case 6: // sll?
             *ALUresult = B << 16;
             break;
-        case 7:
+        case 7: // not
             *ALUresult = ~A;
             break;
     }
@@ -47,7 +47,6 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
         *instruction = Mem[PC >> 2];
         return 0;
     }
-
     //halt condition occured - counter was not a multiple of 4 or was out of range
     else 
         return 1;
@@ -198,13 +197,9 @@ void read_register(unsigned r1,unsigned r2,unsigned *Reg,unsigned *data1,unsigne
 /* 10 Points */
 void sign_extend(unsigned offset,unsigned *extended_value)
 {
-    //signbit is the most signifigant bit
-    unsigned SignBit = offset >> 15;
-
     //if negative, first 16 bits will be made 1s
-    if (SignBit == 1)
+    if ((offset >> 15) == 1)
         *extended_value = 0xFFFF0000 | offset;
-    
     //if postive, first 16 bits will be made 0s
     else 
         *extended_value = 0x0000FFFF & offset;
@@ -221,7 +216,7 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
     if (ALUOp == 7) {
         // add, sub, and, or, slt, sltu, left shitf
         switch(funct) {
-            case 4: // sllv (not sure if this is necessary for the 16 bit left shift)
+            case 0: // sll (not sure if this is necessary for the 16 bit left shift)
                 ALUOp = 6;
                 break;
             case 32: //add
@@ -254,6 +249,7 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 }
 
 
+
 /* Read / Write Memory */
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
@@ -267,7 +263,6 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
         else
             *memdata = Mem[ALUresult >> 2];
     }
-
     //write the value of data2 to the memory location addressed by ALUresult
     if(MemWrite == 1)
     {
@@ -277,9 +272,9 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
         else
             Mem[ALUresult >> 2] = data2;
     }
-
     return 0;
 }
+
 
 
 /* Write Register */
@@ -287,7 +282,6 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
     if (RegWrite == 1) {
-
         switch(MemtoReg) {
             case 0:
                //Value from ALUresult
@@ -309,20 +303,17 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 }
 
 
+
 /* PC update */
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
     //increament by 4 everytime
     *PC += 4;
-
     //branch
     if(Branch == 1 && Zero == 1)
         *PC += (extended_value << 2);
-
     //jump
     if(Jump == 1)
         *PC = (*PC & 0xF0000000) | ((jsec << 2) & 0x0FFFFFFF);
 }
-
-
