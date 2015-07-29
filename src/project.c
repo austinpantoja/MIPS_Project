@@ -1,28 +1,8 @@
 #include "spimcore.h"
 
 
-/** Change Log
- * 7/28 - Completed instruction_partition() by assigning the corresponding value for all of the parameters using bitmasking. -Austin
- * 7/28 - Completed ALU() function. -Austin
- */
-
-
 /* ALU */
 /* 10 Points */
-/* Since I have used it below and you may not be familiar, the ternary operator (?:) in C (and Java)
- *      value = (condition) ? [if true] : [if false]
- *      This is basically and if-else statement used to set a particular value
- *
- * I am pretty sure this is right (at least mostly), but I am not sure how to test right now. This is where I think this could be wrong.
- *  > For cases 0 and 1 (add/sub) I am assuming the sign (positive/negative) logic is handled somewhere else
- *      I'm shakey on the material since the last test, if this is a problem we can cast A and B to signed for the operation
- *  > Currently, the value pointed to by Zero is set every time the function is called (last line of the function)
- *      I don't really like giving a value to *Zero and not *ALUresult (cases where ALUControl is <0, >7, or =6)
- *      Since ALUresult is a pointer there'll always be some value, and it could have some meaningful initial value from somewhere else(?)
- *  > ALUControl is a binary number on the table that describes ALU() in ProjectGuide.doc
- *      Since the value is given as a char, I am comparing with it's ASCII value directly
- *      If this doesn't work we could try casting ALUControl in the switch, or altering the values in the cases (using 0x, 0b, or char vals)
- */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
     switch(ALUControl) {
@@ -33,7 +13,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
             *ALUresult = A - B;
             break;
         case 2:
-            *ALUresult = ((signed)A < (signed)B) ? 1 : 0;
+            *ALUresult = ((int)A < (int)B) ? 1 : 0;
             break;
         case 3:
             *ALUresult = (A < B) ? 1 : 0;
@@ -45,7 +25,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
             *ALUresult = A | B;
             break;
         case 6:
-            B <<= 16;
+            *ALUresult = B << 16;
             break;
         case 7:
             *ALUresult = ~A;
@@ -53,6 +33,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
     }
     *Zero = (*ALUresult == 0) ? 1 : 0;
 }
+
 
 
 /* instruction fetch */
@@ -68,10 +49,10 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
     }
 
     //halt condition occured - counter was not a multiple of 4 or was out of range
-    else
+    else 
         return 1;
-
 }
+
 
 
 /* instruction partition */
@@ -96,8 +77,7 @@ void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsi
 int instruction_decode(unsigned op,struct_controls *controls)
 {
     switch(op) {
-        // r-types add, sub, and, or, slt, sltu
-        case 0: 
+        case 0: // r-types add, sub, and, or, slt, sltu
             controls->RegDst = 1;
             controls->Jump = 0;
             controls->Branch = 0;
@@ -108,8 +88,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 0;
             controls->RegWrite = 1;
             return 0;
-        // j
-        case 2:
+        case 2: // j
             controls->RegDst = 0;
             controls->Jump = 1;
             controls->Branch = 0;
@@ -120,8 +99,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 0;
             controls->RegWrite = 0;
             return 0;
-        // beq
-        case 4:
+        case 4: // beq
             controls->RegDst = 2;
             controls->Jump = 0;
             controls->Branch = 1;
@@ -132,8 +110,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 0;
             controls->RegWrite = 0;
             return 0;
-        // addi
-        case 8:
+        case 8: // addi
             controls->RegDst = 0;
             controls->Jump = 0;
             controls->Branch = 0;
@@ -144,8 +121,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 1;
             controls->RegWrite = 1;
             return 0;
-        //slti
-        case 10:
+        case 10: // slti
             controls->RegDst = 0;
             controls->Jump = 0;
             controls->Branch = 0;
@@ -156,8 +132,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 1;
             controls->RegWrite = 1;
             return 0;
-        //sltiu
-        case 11:
+        case 11: // sltiu
             controls->RegDst = 0;
             controls->Jump = 0;
             controls->Branch = 0;
@@ -168,8 +143,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 1;
             controls->RegWrite = 1;
             return 0;
-        // lui
-        case 15:
+        case 15: // lui
             controls->RegDst = 0;
             controls->Jump = 0;
             controls->Branch = 0;
@@ -180,20 +154,18 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 1;
             controls->RegWrite = 1;
             return 0;
-        // lw
-        case 35:
+        case 35: // lw
             controls->RegDst = 0;
             controls->Jump = 0;
             controls->Branch = 0;
-            controls->MemRead = 0;
-            controls->MemtoReg = 2;
+            controls->MemRead = 1;
+            controls->MemtoReg = 1;
             controls->ALUOp = 0;
-            controls->MemWrite = 1;
+            controls->MemWrite = 0;
             controls->ALUSrc = 1;
-            controls->RegWrite = 0;
+            controls->RegWrite = 1;
             return 0;
-        // sw
-        case 43:
+        case 43: // sw
             controls->RegDst = 2;
             controls->Jump = 0;
             controls->Branch = 0;
@@ -204,42 +176,41 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUSrc = 1;
             controls->RegWrite = 0;
             return 0;
-        // Bad Instruction
-        default:
+        default: // Bad Instruction
             return 1;
     }
 }
+
+
 
 /* Read Register */
 /* 5 Points */
 void read_register(unsigned r1,unsigned r2,unsigned *Reg,unsigned *data1,unsigned *data2)
 {
-    //get value of register r1 and assign it to data1
+    //assign value of register r1 to data1 and r2 to data2
     *data1 = Reg[r1];
-    //get value of register r1 and assign it to data1
     *data2 = Reg[r2];
 }
+
 
 
 /* Sign Extend */
 /* 10 Points */
 void sign_extend(unsigned offset,unsigned *extended_value)
 {
-
     //signbit is the most signifigant bit
     unsigned SignBit = offset >> 15;
 
-    if (SignBit == 1) {
-
-        //if negative, first 16 bits will be made 1s
+    //if negative, first 16 bits will be made 1s
+    if (SignBit == 1)
         *extended_value = 0xFFFF0000 | offset;
-    }
-    else {
-
-        //if postive, first 16 bits will be made 0s
+    
+    //if postive, first 16 bits will be made 0s
+    else 
         *extended_value = 0x0000FFFF & offset;
-    }
 }
+
+
 
 /* ALU operations */
 /* 10 Points */
@@ -248,17 +219,16 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
     if (ALUSrc == 1) 
         data2 = extended_value;
     if (ALUOp == 7) {
-        // funct values from R-type instructions table on MIPS slides pg. 106
         // add, sub, and, or, slt, sltu, left shitf
         switch(funct) {
-            case 4: // sllv (for the 16 bit left shift)
+            case 4: // sllv (not sure if this is necessary for the 16 bit left shift)
                 ALUOp = 6;
                 break;
             case 32: //add
-                ALUOp = 1;
+                ALUOp = 0;
                 break;
             case 34: //sub
-                ALUOp = 2;
+                ALUOp = 1;
                 break;
             case 36: //and
                 ALUOp = 4;
@@ -288,16 +258,6 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
-    //write the value of data2 to the memory location addressed by ALUresult
-    if(MemWrite == 1)
-    {
-        //check for word alignment
-        if(ALUresult % 4 != 0)
-            return 1;
-        else
-            Mem[ALUresult >> 2] = data2;
-    }
-
     //read the content of the memory location addressed by ALUresult to memdata
     if(MemRead == 1)
     {
@@ -306,6 +266,16 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
             return 1;
         else
             *memdata = Mem[ALUresult >> 2];
+    }
+
+    //write the value of data2 to the memory location addressed by ALUresult
+    if(MemWrite == 1)
+    {
+        //check for word alignment
+        if(ALUresult % 4 != 0)
+            return 1;
+        else
+            Mem[ALUresult >> 2] = data2;
     }
 
     return 0;
@@ -338,21 +308,21 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
     }
 }
 
+
 /* PC update */
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
+    //increament by 4 everytime
+    *PC += 4;
+
     //branch
     if(Branch == 1 && Zero == 1)
-        *PC = *PC +4 + (extended_value << 2);
+        *PC += (extended_value << 2);
 
     //jump
     if(Jump == 1)
-        *PC = (*PC & 0xF0000000) + (jsec << 2);
-
-    //next instruction
-    else
-        *PC = *PC + 4;
+        *PC = (*PC & 0xF0000000) | ((jsec << 2) & 0x0FFFFFFF);
 }
 
 
