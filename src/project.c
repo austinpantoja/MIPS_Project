@@ -280,6 +280,7 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
             case 0:
                //Value from ALUresult
                if (RegDst == 0)
+                    // checking to see which register will get the value
                     Reg[r2] = ALUresult;
                else
                     Reg[r3] = ALUresult;
@@ -288,6 +289,7 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
             case 1:
                //Value from memdata
                 if (RegDst == 0)
+                    // checking to see which register will get the value
                     Reg[r2] = memdata;
                else
                     Reg[r3] = memdata;
