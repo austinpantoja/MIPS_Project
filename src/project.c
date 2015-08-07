@@ -1,3 +1,11 @@
+/*
+Group 12
+Samantha Fahed
+Kevin Jones
+Austin Pantoja
+*/
+
+
 #include "spimcore.h"
 
 
@@ -25,7 +33,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
         case 5: // or
             *ALUresult = A | B;
             break;
-        case 6: // sll?
+        case 6: // sll
             *ALUresult = B << 16;
             break;
         case 7: // not
@@ -33,6 +41,7 @@ void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
             break;
     }
 
+    // Check for zero
     *Zero = (*ALUresult == 0) ? 1 : 0;
 }
 
@@ -56,14 +65,13 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 /* 10 Points */
 void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsigned *r2, unsigned *r3, unsigned *funct, unsigned *offset, unsigned *jsec)
 {
-    // May need to cast the hex values to unsigned, but I don't think that should make any difference
-    *op = (instruction & 0xfc000000) >> 26;
-    *r1 = (instruction & 0x3e00000) >> 21;
-    *r2 = (instruction & 0x1f0000) >> 16;
-    *r3 = (instruction & 0xf800) >> 11;
-    *funct = instruction & 0x3f;
-    *offset = instruction & 0xffff;
-    *jsec = instruction & 0x3ffffff;
+    *op = (instruction & 0xfc000000) >> 26; // instruction [31-26]
+    *r1 = (instruction & 0x3e00000) >> 21; // instruction [25-21]
+    *r2 = (instruction & 0x1f0000) >> 16; // instruction [20-16]
+    *r3 = (instruction & 0xf800) >> 11; // instruction [15-11]
+    *funct = instruction & 0x3f; // instruction [5-0]
+    *offset = instruction & 0xffff; // instruction [15-0]
+    *jsec = instruction & 0x3ffffff; // instruction [25-0]
 }
 
 /* instruction decode */
